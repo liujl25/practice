@@ -16,6 +16,7 @@ public class MyRunnable implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("group: "+Thread.currentThread().getThreadGroup().getName());
         System.out.println(Thread.currentThread().getName() + " Start. Time = " + new Date());
         processCommand();
         System.out.println(Thread.currentThread().getName() + " End. Time = " + new Date());

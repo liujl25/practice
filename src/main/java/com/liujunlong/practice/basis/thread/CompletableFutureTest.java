@@ -9,8 +9,29 @@ import java.util.concurrent.*;
  * @date 2023/3/23 00:37
  */
 public class CompletableFutureTest {
+
+
     public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
-//        CompletableFuture<String> completableFuture = CompletableFuture.completedFuture("1123");
+
+        testSupplyAsync();
+
+    }
+
+    public static void testSupplyAsync() {
+        // supplyAsync 获取有结果的
+        CompletableFuture<String> res = CompletableFuture.supplyAsync(() -> {
+            return "result from supplyAsync";
+        }, ThreadPoolExecutorDemo.executor);
+        System.out.println(res.join());
+
+        //CompletableFuture.runAsync 不能返回结果
+        CompletableFuture<Void> res1 = CompletableFuture.runAsync(() -> {
+            System.out.println("CompletableFuture.runAsync, no return");
+        }, ThreadPoolExecutorDemo.executor);
+    }
+
+    public static void test() throws ExecutionException, InterruptedException, TimeoutException {
+        //        CompletableFuture<String> completableFuture = CompletableFuture.completedFuture("1123");
 //        System.out.println(completableFuture.join());
 //        String s = completableFuture.get();
 //        System.out.println(s);
@@ -43,7 +64,7 @@ public class CompletableFutureTest {
 //        c1.join();
 //        c2.join();
 //        c3.join();
-       
+
         System.out.println("done");
         System.out.println(constant.join());
 

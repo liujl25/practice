@@ -11,29 +11,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestCustomThread {
     public static void main(String[] args) {
-//        testThread();
+        testThread();
     }
 
     static class MyFactory implements ThreadFactory {
 
         private final AtomicInteger poolNumber = new AtomicInteger(1);
-        private final ThreadGroup group;
+        private final ThreadGroup group = new ThreadGroup("后台线程");
         private final AtomicInteger threadNumber = new AtomicInteger(1);
         private final String namePrefix;
 
         MyFactory() {
             SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() :
-                    Thread.currentThread().getThreadGroup();
-            namePrefix = "pool-" +
-                    poolNumber.getAndIncrement() +
-                    "-thread-";
+//            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            namePrefix = group.getName() + "-" + poolNumber.getAndIncrement() + "-thread-";
         }
 
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(group, r,
-                    namePrefix + threadNumber.getAndIncrement(),
-                    0);
+            Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
             if (t.isDaemon())
                 t.setDaemon(false);
             if (t.getPriority() != Thread.NORM_PRIORITY)
@@ -59,7 +54,6 @@ public class TestCustomThread {
     static void testThread() {
         Executors.defaultThreadFactory();
 
-        ThreadGroup group = new ThreadGroup("后台线程");
         Thread thread = new MyThread();
 
         ThreadPoolExecutor executor = new ThreadPoolExecutor(50,
@@ -69,7 +63,7 @@ public class TestCustomThread {
                 new ArrayBlockingQueue<>(10),
                 new MyFactory());
 
-        executor.execute(thread);
+        executor.execute(new MyRunnable("1"));
         executor.shutdown();
     }
 }
