@@ -12,15 +12,20 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>测试 jdbc 批量插入数据
@@ -40,6 +45,34 @@ public class StudentController {
 
     @Autowired
     private TransactionTemplate txTemplate;
+
+    @GetMapping("/list/{num}")
+    public List<Student> getStudents(@Valid @PathVariable("num") @Max(5) Integer num) {
+        Connection conn = JdbcUtil.initConnection();
+        ArrayList<Student> list = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("select * from student");
+            //设置每次读取的数量，需要开启游标支持
+            preparedStatement.setFetchSize(num);
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.getResultSet();
+            Student student;
+            while (resultSet.next()) {
+                student = new Student();
+                student.setSid(resultSet.getLong(1));
+                student.setName(resultSet.getString(2));
+                student.setAge(resultSet.getInt(3));
+                student.setPhone(resultSet.getString(4));
+                student.setAddress(resultSet.getString(5));
+                list.add(student);
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
 
     @PostMapping("/insert/jdbc/{times}")
     public String insertWithJdbc(@Valid @PathVariable("times") @NotNull Integer times) {

@@ -13,7 +13,8 @@ import java.sql.SQLException;
  */
 public class JdbcUtil {
 
-    private static final String url = "jdbc:mysql://192.168.237.128:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai";
+    //&useCursorFetch=true 开启游标
+    private static final String url = "jdbc:mysql://192.168.237.128:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useCursorFetch=true";
     private static final String user = "root";
     private static final String password = "root";
 
